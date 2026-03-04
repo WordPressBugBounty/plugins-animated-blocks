@@ -94,3 +94,6 @@ Tested on the latest WP version
 
 = 1.1.3 = 
 Refactor block asset enqueue flow, add class guard, and synchronize version metadata
+
+= 1.1.4 = 
+Use editor-canvas block assets hook for animate.css
