@@ -1,9 +1,8 @@
 === Animated Blocks on Scroll ===
 Contributors: virgildia
-Donate link: http://virgiliudiaconu.com/
 Tags: animated block, blocks, animation, css animations, css3, gutenberg, aos
 Requires at least: 5.0
-Tested up to: 6.4.2
+Tested up to: 6.9.1
 Requires PHP: 5.6+
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -94,7 +93,4 @@ Reverted to milliseconds for duration and delay
 Tested on the latest WP version
 
 = 1.1.3 = 
-Added create-block package
-
-= 1.1.4 = 
-Code cleanup
+Refactor block asset enqueue flow, add class guard, and synchronize version metadata
