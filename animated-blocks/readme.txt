@@ -1,9 +1,9 @@
 === Animated Blocks on Scroll ===
 Contributors: virgildia
 Tags: animation, scroll, css-animations, reveal, gutenberg
-Requires at least: 5.0
-Tested up to: 6.9.4
-Requires PHP: 5.6+
+Requires at least: 6.0
+Tested up to: 6.9.1
+Requires PHP: 7.0
 Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -39,13 +39,13 @@ PHP 5.6+ is recommended, WordPress 5.0+, and Gutenberg must be active.
 
 == Documentation ==
 
-Select Animated Block from the Layout Elements group and add any content blocks within it. Select an animation from the dropdown list or add your own custom CSS class. The selected animation or custom CSS class will be added to the block when the user scrolls to it.
+Select a Gutenberg block and open the block settings sidebar to find the Animations panel. Choose an animation from the dropdown, optionally add a custom animation class, and adjust duration, delay, threshold, opacity, and offset settings. The selected animation classes are added when the block enters the viewport.
 
-Animated Block is a parent block (a container), nesting as many blocks as you want. 
+Animation controls can be disabled globally from Settings > Animated Blocks by turning off "Show animation controls on all blocks". When that option is disabled, blocks that already have saved animation settings will keep showing the animation panel until those settings are cleared.
 
-You can also add the same animation settings directly to regular Gutenberg blocks. If you want to hide those controls globally, go to Settings > Animated Blocks and disable "Show animation controls on all blocks".
+You can also use the Animated Block container from the Design block group. Animated Block is a parent block that lets you nest as many blocks as you want and apply the same animation settings to the whole container.
 
-When that option is disabled, blocks that already have saved animation settings will keep showing the animation panel until those settings are removed.
+If you need a custom effect, enter your own CSS class name in the Custom animation field and load the matching CSS in your theme or plugin.
 
 == Screenshots ==
 
@@ -66,6 +66,42 @@ Go to your WordPress Admin -> Plugins -> Add New. Search for Gutenberg Animated 
 = What is Gutenberg? =
  
 Gutenberg is the name of the new block based editor introduced in WordPress 5. Gutenberg makes it easy to create content within the editor using blocks.
+
+= How do I add animation to a normal Gutenberg block? =
+
+Select any supported block, open the block inspector sidebar, and look for the Animations panel. Choose an effect such as fade, bounce, slide, or zoom, then save the post and view it on the front end.
+
+= Can I animate a group of blocks together? =
+
+Yes. Insert the Animated Block container from the Design block group and place any inner blocks inside it. The animation settings apply to the container as a whole.
+
+= Does this plugin work with scroll reveal and entrance animations? =
+
+Yes. The plugin adds CSS animation classes when the block reaches the configured scroll threshold, making it suitable for scroll reveal, fade in on scroll, slide in on scroll, zoom in on scroll, and similar entrance effects.
+
+= Can I use Animate.css classes or my own custom CSS animations? =
+
+Yes. The plugin includes a list of predefined animation classes and also allows you to enter a custom class name. You can pair that custom class with your own CSS animation rules in your theme or another plugin.
+
+= How does delay work? =
+
+Delay controls how long the plugin waits before adding the animation classes after the block reaches the trigger point in the viewport. Duration controls how long the CSS animation itself runs.
+
+= What does threshold mean? =
+
+Threshold is the percentage of the block that must enter the viewport before the animation starts. Lower values trigger earlier, while higher values wait for more of the block to become visible.
+
+= Can I offset animations for a fixed header or sticky navigation? =
+
+Yes. Use the Offset Top field in the block's Advanced settings to account for fixed headers, sticky menus, or other content pinned to the top of the page.
+
+= Can I disable animation controls for regular blocks? =
+
+Yes. Go to Settings > Animated Blocks and disable "Show animation controls on all blocks". Existing blocks with saved animation settings will keep their controls until those settings are removed.
+
+= What class is added when the animation has finished? =
+
+The class name "ab-animation-end" is added after the CSS animation ends. You can target that class in custom CSS if you need different end-state styling.
 
 
 == Changelog ==
