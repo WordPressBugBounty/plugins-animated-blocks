@@ -1,9 +1,10 @@
 === Animated Blocks on Scroll ===
 Contributors: virgildia
-Tags: animated block, blocks, animation, css animations, css3, gutenberg, aos
+Tags: animation, scroll, css-animations, reveal, gutenberg
 Requires at least: 5.0
-Tested up to: 6.9.1
+Tested up to: 6.9.4
 Requires PHP: 5.6+
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +19,9 @@ Add scroll based animations to WordPress Gutenberg blocks.
  - Choose from 76 cross-browser CSS3 animations or add your own
  - Preview animations in the editor
  - Adjust the animation duration, delay, scroll threshold, and offset
+ - Apply animation controls directly to regular Gutenberg blocks
+ - Show or hide animation controls for regular blocks from Settings > Animated Blocks
+ - Replay the selected dropdown animation from the editor inspector
 
 = Settings =
 
@@ -26,6 +30,7 @@ Add scroll based animations to WordPress Gutenberg blocks.
  - Threshold: Add animation when x% of the element enters the screen.
  - Start with opacity 0: Set the element to opacity 0 when the page loads. The option works for elements transitioning to 100% opacity through CSS.
  - Offset Top (available in the block's advanced settings): Number of pixels to offset the animated block from the top of the page. Useful when a page has a fixed top navigation bar.
+ - Show animation controls on all blocks: Enable or disable animation controls for regular Gutenberg blocks. When disabled, blocks that already have saved animation settings keep showing the controls until those settings are cleared.
  - Class name "ab-animation-end" is added to the animated block after the CSS animation has ended. This class name can be used to add custom styles. 
 
 == Requirements ==
@@ -38,11 +43,17 @@ Select Animated Block from the Layout Elements group and add any content blocks 
 
 Animated Block is a parent block (a container), nesting as many blocks as you want. 
 
+You can also add the same animation settings directly to regular Gutenberg blocks. If you want to hide those controls globally, go to Settings > Animated Blocks and disable "Show animation controls on all blocks".
+
+When that option is disabled, blocks that already have saved animation settings will keep showing the animation panel until those settings are removed.
+
 == Screenshots ==
 
 1. Animation settings in the block inspector
-2. Animation list with search functionality
-2. Add any blocks within Animated Block
+2. Animation list
+3. Animated block container
+4. Settings page for Animated Blocks
+5. Testing animations
 
 == Frequently Asked Questions ==
 
@@ -95,5 +106,13 @@ Tested on the latest WP version
 = 1.1.3 = 
 Refactor block asset enqueue flow, add class guard, and synchronize version metadata
 
-= 1.1.4 = 
+= 1.1.4 =
 Use editor-canvas block assets hook for animate.css
+
+= 1.1.5 = 
+Added animation controls for regular Gutenberg blocks
+Added a WordPress settings page at Settings > Animated Blocks
+Added the "Show animation controls on all blocks" option
+Kept animation controls visible for blocks with existing saved animation data when global controls are disabled
+Added a None animation option and a quick action to clear all animation settings from a block
+Added a replay button next to the animation dropdown in the editor

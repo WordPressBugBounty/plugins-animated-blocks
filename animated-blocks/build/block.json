@@ -4,7 +4,7 @@
   "name": "ab/animate",
   "title": "Animated Block",
   "category": "design",
-  "description": "Add blocks into the animated container.",
+  "description": "Add blocks into the container.",
   "keywords": [
     "animate",
     "scroll",
@@ -38,6 +38,5 @@
     }
   },
   "editorScript": "file:./index.js",
-  "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "editorStyle": "file:./index.css"
 }
