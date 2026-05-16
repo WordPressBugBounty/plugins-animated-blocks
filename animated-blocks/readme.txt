@@ -4,7 +4,7 @@ Tags: animation, scroll, css-animations, reveal, gutenberg
 Requires at least: 6.0
 Tested up to: 6.9.1
 Requires PHP: 7.0
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -152,3 +152,7 @@ Added the "Show animation controls on all blocks" option
 Kept animation controls visible for blocks with existing saved animation data when global controls are disabled
 Added a None animation option and a quick action to clear all animation settings from a block
 Added a replay button next to the animation dropdown in the editor
+
+= 1.1.6 = 
+ServerSideRender compatibility for animated attributes on dynamic blocks.
+Update Animated Block to Block API version 3.

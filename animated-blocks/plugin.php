@@ -8,7 +8,7 @@
  * Author URI: http://virgiliudiaconu.com/
  * Requires at least: 5.9
  * Requires PHP: 7.0
- * Version: 1.1.5
+ * Version: 1.1.6
  * License: GPL-2.0-or-later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: animated-blocks
@@ -35,7 +35,7 @@ class Animated_Blocks
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.1.5';
+	const VERSION = '1.1.6';
 
 	/**
 	 * Gets the plugin file path.
@@ -80,6 +80,7 @@ class Animated_Blocks
 		add_action('admin_menu', array('Animated_Blocks_Settings', 'register_page'));
 		add_action('enqueue_block_assets', array('Animated_Blocks_Assets', 'enqueue_editor_block_assets'));
 		add_action('enqueue_block_editor_assets', array('Animated_Blocks_Assets', 'enqueue_editor_settings'));
+		add_filter('register_block_type_args', array('Animated_Blocks_Block', 'add_animation_attributes'), 10, 2);
 		add_filter('render_block', array('Animated_Blocks_Block', 'maybe_animate_block'), 10, 2);
 	}
 }

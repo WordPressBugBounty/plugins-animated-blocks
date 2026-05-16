@@ -24,6 +24,72 @@ class Animated_Blocks_Block {
 	}
 
 	/**
+	 * Adds animation attributes to server-registered blocks.
+	 *
+	 * @param array  $args Block registration arguments.
+	 * @param string $block_type Block type name.
+	 * @return array
+	 */
+	public static function add_animation_attributes( $args, $block_type ) {
+		if ( ! self::is_extendable_block( $block_type ) ) {
+			return $args;
+		}
+
+		if ( empty( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+			$args['attributes'] = array();
+		}
+
+		$args['attributes'] = array_merge(
+			self::get_animation_attribute_definitions(),
+			$args['attributes']
+		);
+
+		return $args;
+	}
+
+	/**
+	 * Determines whether a block can receive animation controls.
+	 *
+	 * @param string $block_type Block type name.
+	 * @return bool
+	 */
+	private static function is_extendable_block( $block_type ) {
+		return 'ab/animate' !== $block_type && 'core/block' !== $block_type;
+	}
+
+	/**
+	 * Gets the animation attribute schema shared by extended blocks.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	private static function get_animation_attribute_definitions() {
+		return array(
+			'animation'   => array(
+				'type' => 'string',
+			),
+			'customClass' => array(
+				'type' => 'string',
+			),
+			'duration'    => array(
+				'type' => 'string',
+			),
+			'delay'       => array(
+				'type' => 'string',
+			),
+			'threshold'   => array(
+				'type' => 'number',
+			),
+			'offsetTop'   => array(
+				'type' => 'string',
+			),
+			'hideEl'      => array(
+				'type'    => 'boolean',
+				'default' => false,
+			),
+		);
+	}
+
+	/**
 	 * Injects animation attributes into block markup and loads assets on demand.
 	 *
 	 * @param string $block_content Rendered block HTML.
@@ -74,20 +140,24 @@ class Animated_Blocks_Block {
 			$props['class'] .= ' ab-is-hidden';
 		}
 
-		if ( isset( $attributes['delay'] ) && '' !== $attributes['delay'] ) {
-			$props['data-scroll-delay'] = (string) $attributes['delay'];
+		$delay = self::get_numeric_attribute( $attributes, 'delay' );
+		if ( null !== $delay ) {
+			$props['data-scroll-delay'] = $delay;
 		}
 
-		if ( isset( $attributes['threshold'] ) && '' !== $attributes['threshold'] ) {
-			$props['data-scroll-threshold'] = (string) $attributes['threshold'];
+		$threshold = self::get_numeric_attribute( $attributes, 'threshold' );
+		if ( null !== $threshold ) {
+			$props['data-scroll-threshold'] = $threshold;
 		}
 
-		if ( isset( $attributes['offsetTop'] ) && '' !== $attributes['offsetTop'] ) {
-			$props['data-scroll-offset-top'] = (string) $attributes['offsetTop'];
+		$offset_top = self::get_numeric_attribute( $attributes, 'offsetTop' );
+		if ( null !== $offset_top ) {
+			$props['data-scroll-offset-top'] = $offset_top;
 		}
 
-		if ( isset( $attributes['duration'] ) && '' !== $attributes['duration'] ) {
-			$props['style'] = 'animation-duration:' . ( (float) $attributes['duration'] / 1000 ) . 's';
+		$duration = self::get_numeric_attribute( $attributes, 'duration' );
+		if ( null !== $duration ) {
+			$props['style'] = 'animation-duration:' . ( (float) $duration / 1000 ) . 's';
 		}
 
 		return $props;
@@ -103,16 +173,62 @@ class Animated_Blocks_Block {
 		$classes = array();
 
 		if ( ! empty( $attributes['animation'] ) ) {
-			$classes[] = $attributes['animation'];
+			$classes = array_merge(
+				$classes,
+				self::sanitize_class_list( $attributes['animation'] )
+			);
 		}
 
 		if ( ! empty( $attributes['customClass'] ) ) {
-			$classes[] = $attributes['customClass'];
+			$classes = array_merge(
+				$classes,
+				self::normalize_custom_class_list( $attributes['customClass'] )
+			);
 		}
 
+		return ! empty( $classes ) ? implode( ' ', $classes ) : '';
+	}
+
+	/**
+	 * Gets a numeric block attribute as a string when valid.
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $name Attribute name.
+	 * @return string|null
+	 */
+	private static function get_numeric_attribute( $attributes, $name ) {
+		if ( ! isset( $attributes[ $name ] ) || '' === $attributes[ $name ] || ! is_numeric( $attributes[ $name ] ) ) {
+			return null;
+		}
+
+		return (string) $attributes[ $name ];
+	}
+
+	/**
+	 * Sanitizes a whitespace-separated CSS class list.
+	 *
+	 * @param mixed $class_list Raw class list.
+	 * @return array<int,string>
+	 */
+	private static function sanitize_class_list( $class_list ) {
+		$classes = preg_split( '/\s+/', (string) $class_list );
+		$classes = array_map( 'sanitize_html_class', $classes );
 		$classes = array_filter( array_map( 'trim', $classes ) );
 
-		return ! empty( $classes ) ? implode( ' ', $classes ) : '';
+		return array_values( array_unique( $classes ) );
+	}
+
+	/**
+	 * Normalizes custom animation classes without stripping valid framework syntax.
+	 *
+	 * @param mixed $class_list Raw class list.
+	 * @return array<int,string>
+	 */
+	private static function normalize_custom_class_list( $class_list ) {
+		$classes = preg_split( '/\s+/', (string) $class_list );
+		$classes = array_filter( array_map( 'trim', $classes ) );
+
+		return array_values( array_unique( $classes ) );
 	}
 
 	/**
@@ -125,6 +241,35 @@ class Animated_Blocks_Block {
 	private static function inject_props_into_first_tag( $block_content, $props ) {
 		if ( '' === trim( $block_content ) ) {
 			return $block_content;
+		}
+
+		if ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
+			$processor = new WP_HTML_Tag_Processor( $block_content );
+
+			if ( ! $processor->next_tag() ) {
+				return $block_content;
+			}
+
+			foreach ( $props as $name => $value ) {
+				if ( 'class' === $name ) {
+					foreach ( self::sanitize_class_list( $value ) as $class_name ) {
+						$processor->add_class( $class_name );
+					}
+
+					continue;
+				}
+
+				if ( 'style' === $name ) {
+					$existing = $processor->get_attribute( 'style' );
+					$existing = is_string( $existing ) ? rtrim( trim( $existing ), ';' ) : '';
+					$incoming = ltrim( trim( $value ), ';' );
+					$value    = trim( $existing . ';' . $incoming, ';' );
+				}
+
+				$processor->set_attribute( $name, $value );
+			}
+
+			return $processor->get_updated_html();
 		}
 
 		return preg_replace_callback(
@@ -153,22 +298,25 @@ class Animated_Blocks_Block {
 	 * @return string
 	 */
 	private static function merge_attribute( $attributes, $name, $value ) {
-		$pattern = '/\s' . preg_quote( $name, '/' ) . '="([^"]*)"/';
+		$pattern = '/\s' . preg_quote( $name, '/' ) . '\s*=\s*([\'"])(.*?)\1/s';
 
-		if ( preg_match( $pattern, $attributes, $match ) ) {
-			$merged_value = $value;
-
-			if ( 'class' === $name ) {
-				$merged_value = trim( $match[1] . ' ' . $value );
-			} elseif ( 'style' === $name ) {
-				$existing     = rtrim( trim( $match[1] ), ';' );
-				$incoming     = ltrim( trim( $value ), ';' );
-				$merged_value = trim( $existing . ';' . $incoming, ';' );
-			}
-
-			return preg_replace(
+		if ( preg_match( $pattern, $attributes ) ) {
+			return preg_replace_callback(
 				$pattern,
-				' ' . $name . '="' . esc_attr( $merged_value ) . '"',
+				function ( $match ) use ( $name, $value ) {
+					$quote        = $match[1];
+					$merged_value = $value;
+
+					if ( 'class' === $name ) {
+						$merged_value = trim( $match[2] . ' ' . $value );
+					} elseif ( 'style' === $name ) {
+						$existing     = rtrim( trim( $match[2] ), ';' );
+						$incoming     = ltrim( trim( $value ), ';' );
+						$merged_value = trim( $existing . ';' . $incoming, ';' );
+					}
+
+					return ' ' . $name . '=' . $quote . esc_attr( $merged_value ) . $quote;
+				},
 				$attributes,
 				1
 			);
